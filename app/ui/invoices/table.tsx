@@ -3,6 +3,11 @@ import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
 import InvoiceStatus from '@/app/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import { fetchFilteredInvoices } from '@/app/lib/data';
+import {
+  ClientsTable
+} from '../../lib/definitions';
+
+import axios from 'axios';
 
 export default async function InvoicesTable({
   query,
@@ -13,42 +18,61 @@ export default async function InvoicesTable({
 }) {
   const invoices = await fetchFilteredInvoices(query, currentPage);
 
+  var config = {
+    method: 'get',
+    url: 'https://g4l1trazte.execute-api.us-east-1.amazonaws.com/prod/clients',
+    headers: {
+      'authority': 'g4l1trazte.execute-api.us-east-1.amazonaws.com',
+      'accept': 'application/json, text/plain, */*',
+      'accept-language': 'en,es;q=0.9',
+      'origin': 'https://suite.adlersocial.com',
+      'referer': 'https://suite.adlersocial.com/',
+      'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Linux"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'cross-site',
+      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      'x-api-key': 'Fp29wYCdu7aX2mG9NxpS47G2f706Pc3paYE53EQE'
+    }
+  };
+
+
+  const response = await axios(config);
+  console.log(JSON.stringify(response.data.clients));
+  const clients: any[] = response.data.clients;
+
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
-            {invoices?.map((invoice) => (
+            {clients?.map((client) => (
               <div
-                key={invoice.id}
+                key={client.id}
                 className="mb-2 w-full rounded-md bg-white p-4"
               >
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <div className="mb-2 flex items-center">
-                      <Image
-                        src={invoice.image_url}
+                      {/* <Image
+                        src={client.id}
                         className="mr-2 rounded-full"
                         width={28}
                         height={28}
-                        alt={`${invoice.name}'s profile picture`}
-                      />
-                      <p>{invoice.name}</p>
+                        alt={`${client.clientName}'s profile picture`}
+                      /> */}
+                      <p>{client.id}</p>
                     </div>
-                    <p className="text-sm text-gray-500">{invoice.email}</p>
+                    <p className="text-sm text-gray-500">{client.id}</p>
                   </div>
-                  <InvoiceStatus status={invoice.status} />
+                  {/* <InvoiceStatus status={client.status} /> */}
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
-                  <div>
-                    <p className="text-xl font-medium">
-                      {formatCurrency(invoice.amount)}
-                    </p>
-                    <p>{formatDateToLocal(invoice.date)}</p>
-                  </div>
                   <div className="flex justify-end gap-2">
-                    <UpdateInvoice id={invoice.id} />
-                    <DeleteInvoice id={invoice.id} />
+                    <UpdateInvoice id={client.id} />
+                    <DeleteInvoice id={client.id} />
                   </div>
                 </div>
               </div>
